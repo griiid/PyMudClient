@@ -1,4 +1,5 @@
 import re
+import time
 
 from .display import show_input
 from .shared_data import (
@@ -52,14 +53,15 @@ def thread_job_recv(trigger_list):
             if not data:
                 continue
 
+            last_time = time.time()
+            while time.time() - last_time < 0.1:
+                data += g_tn.get().read_very_eager()
+                time.sleep(0.01)
+
             data = remove_strange_color_code(data)
             content_list = dec(data).split('\r\n')
 
             for content in content_list:
-                # TODO: 用 regex 取代這些無用的行
-                if content == '' or content == '\x1B[2;37;0m' or content == '\x1B[2;37;0m> ' or content == '> ':
-                    continue
-
                 content = dec(enc(content))
                 replace_line_print(content)
 
