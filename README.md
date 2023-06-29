@@ -16,6 +16,7 @@
     - [Timer](#timer)
       - [Timer class 參數](#timer-class-參數)
       - [使用範例](#使用範例-3)
+  - [已知問題](#已知問題)
 
 ## 這是什麼？
 
@@ -32,13 +33,15 @@
 - 連線：根據輸入的 host 跟 port 進行連線。
 - 斷線重連：發生異常、server 重新啟動導致的斷線，會等待 3 秒後重新連線。
 - 顯示：顯示 server 回傳的內容。
+  - 有處理 big5 中文顯示的問題。
+  - 只針對萬王之王 (kk.muds.idv.tw:4000) 進行測試過。
 - 輸入介面：在最後一行顯示輸入的文字；送出的文字還沒有改動時按下 Enter 會再送一次。
 
 ## 使用範例
 
 ```py
 from aliases import ALIAS_LIST
-import mud
+import pymudclient
 from settings import (
     HOST,
     PORT,
@@ -82,7 +85,7 @@ pattern 跟 func 2 選 1。
 #### 使用範例
 
 ```py
-from mud import Alias
+from pymudclient import Alias
 
 ALIAS_LIST = [
     Alias('kk', pattern='kingdom %0'),
@@ -106,6 +109,8 @@ ALIAS_LIST = [
 #### 使用範例
 
 ```py
+from pymudclient import Trigger
+
 def summon(match):
     return f'summon {match[0]}'
 
@@ -130,9 +135,15 @@ TRIGGER_LIST = [
 #### 使用範例
 
 ```py
+from pymudclient import Timer
+
 TIMER_LIST = [
     Timer(900, data='save'),
 ]
 ```
 
 - 每 900 秒傳送一個 `save` 到 host。
+
+## 已知問題
+
+- 部分中文字顯示會有不正確位置的換行。
