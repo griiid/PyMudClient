@@ -1,6 +1,7 @@
 #!/bin/bash
 
 build() {
+    echo -e "\x1B[1;33mStart Building...\x1B[m"
     python setup.py sdist bdist_wheel
 }
 
@@ -8,6 +9,7 @@ test_pypi() {
     if [[ -z $1 || $1 -ne 0 ]]; then
         build
     fi
+    echo -e "\x1B[1;33mUpload to test.pypi...\x1B[m"
     twine upload --repository testpypi --skip-existing dist/*
 }
 
@@ -15,6 +17,7 @@ pypi() {
     if [[ -z $1 || $1 -ne 0 ]]; then
         build
     fi
+    echo -e "\x1B[1;33mUpload to pypi...\x1B[m"
     twine upload  --skip-existing dist/*
 }
 
@@ -40,7 +43,7 @@ while true; do
         case $REPLY in
             1) all; break 2;;
             2) test_pypi; break 2;;
-            3) pypi; brea 2;;
+            3) pypi; break 2;;
             $((${#items[@]}+1))) break 2;;
             *) echo "Unknown choice $REPLY"; break;
         esac
