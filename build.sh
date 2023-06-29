@@ -24,7 +24,7 @@ pypi() {
 all() {
     build
     test_pypi 0
-    test_pypi 0
+    pypi 0
 }
 
 items=(
