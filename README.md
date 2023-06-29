@@ -18,6 +18,7 @@
       - [Timer class 參數](#timer-class-參數)
       - [使用範例](#使用範例-3)
   - [已知問題](#已知問題)
+  - [License](#license)
 
 ## 這是什麼？
 
@@ -151,4 +152,8 @@ TIMER_LIST = [
 
 ## 已知問題
 
-- 部分中文字顯示會有不正確位置的換行。
+- ctrl-z 把 process 移到背景後，再 fg 切回前景，輸入會變得異常。
+
+## License
+
+- [MIT](https://github.com/griiid/PyMudClient/blob/master/LICENSE)
