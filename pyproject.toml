@@ -1,0 +1,25 @@
+[tool.yapf]
+BASED_ON_STYLE = "google"
+COLUMN_LIMIT = 119
+SPACES_BEFORE_COMMENT = 4
+# 結尾逗號跟括號中間空一格
+SPACE_BETWEEN_ENDING_COMMA_AND_CLOSING_BRACKET = true
+# 第一個參數後前換行
+SPLIT_BEFORE_FIRST_ARGUMENT = true
+# 結尾括號前換行
+SPLIT_BEFORE_CLOSING_BRACKET = true
+# 結尾括號不縮排
+DEDENT_CLOSING_BRACKETS = true
+
+[tool.pytest.ini_options]
+addopts = "--ds=scrm.settings --reuse-db"
+python_files = "tests.py test_*.py"
+
+[tool.isort]
+# length_sort_stdlib=true
+src_paths=["isort","test"]
+multi_line_output=3
+force_grid_wrap=2
+include_trailing_comma=true
+known_local_folder=[]
+sections=["FUTURE", "STDLIB", "FIRSTPARTY", "THIRDPARTY", "LOCALFOLDER"]
