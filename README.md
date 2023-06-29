@@ -1,12 +1,19 @@
-# pymudclient: 用 Python 開發的 MUD Client 核心
+# PyMudClient: 用 Python 開發的 MUD Client 核心
 
-- [pymudclient: 用 Python 開發的 MUD Client 核心](#pymudclient-用-python-開發的-mud-client-核心)
+## 這是什麼？
+
+- MUD, Multi-User Dungeon，是多人即時虛擬類遊戲，通常以文字描述為基礎。
+- **pymudclient** 實作了連線、斷線重連、顯示、輸入介面、Alias、Trigger、Timer 的功能。
+
+---
+
+- [PyMudClient: 用 Python 開發的 MUD Client 核心](#pymudclient-用-python-開發的-mud-client-核心)
   - [這是什麼？](#這是什麼)
   - [已測試過環境](#已測試過環境)
-  - [功能說明](#功能說明)
+  - [支援功能](#支援功能)
   - [安裝](#安裝)
   - [使用範例](#使用範例)
-  - [功能說明](#功能說明-1)
+  - [功能說明](#功能說明)
     - [run](#run)
     - [Alias](#alias)
       - [Alias class 參數](#alias-class-參數)
@@ -20,17 +27,12 @@
   - [已知問題](#已知問題)
   - [License](#license)
 
-## 這是什麼？
-
-- MUD, Multi-User Dungeon，是多人即時虛擬類遊戲，通常以文字描述為基礎。
-- **pymudclient** 實作了連線、斷線重連、顯示、輸入介面、Alias、Trigger、Timer 的功能。
-
 ## 已測試過環境
 
 - macOS Ventura 13.3.1 (a)
 - GNU/Linux 5.15.0-1032-raspi aarch64
 
-## 功能說明
+## 支援功能
 
 - 連線：根據輸入的 host 跟 port 進行連線。
 - 斷線重連：發生異常、server 重新啟動導致的斷線，會等待 3 秒後重新連線。
@@ -67,6 +69,8 @@ mud.run(
 ## 功能說明
 
 ### run
+
+- 連線至 `<host>:<port>`
 
 ```py
 run(host, port, alias_list=None, trigger_list=None, timer_list=None)
