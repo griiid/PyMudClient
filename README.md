@@ -7,7 +7,7 @@
   - [安裝](#安裝)
   - [使用範例](#使用範例)
   - [功能說明](#功能說明-1)
-    - [mud_run](#mud_run)
+    - [run](#run)
     - [Alias](#alias)
       - [Alias class 參數](#alias-class-參數)
       - [使用範例](#使用範例-1)
@@ -65,7 +65,7 @@ mud.run(
 
 ## 功能說明
 
-### mud_run
+### run
 
 ```py
 run(host, port, alias_list=None, trigger_list=None, timer_list=None)
