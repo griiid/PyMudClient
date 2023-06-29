@@ -117,7 +117,6 @@ def _input_backspace(_, char_ord):
 
 
 def _alias_pattern_process(start_text, pattern, text):
-    text = text.replace(f'{start_text}', '', 1)
     split_text = text.split()
     params = {}
 
@@ -153,7 +152,11 @@ def _alias_pattern_process(start_text, pattern, text):
 
 def _alias_function(text):
     for alias in alias_list:
-        if not text.startswith(alias.start_text):
+        if text == alias.start_text:
+            text = ''
+        elif text.startswith(alias.start_text + ' '):
+            text = text.replace(alias.start_text + ' ', '', 1)
+        else:
             continue
 
         if alias.pattern:
