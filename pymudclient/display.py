@@ -9,7 +9,7 @@ def show_input():
     '''將目前為止輸入的字顯示在畫面上'''
 
     if g_input['last_send'] != '':
-        replace_line_print(f'{g_input["last_send"]}', end='\r', flush=True, color=False)
+        replace_line_print(f'\x1B[30;47m{g_input["last_send"]}\x1B[m', end='\r', flush=True, color=False)
     else:
         replace_line_print(f'{g_input["input"]}', end='\r', flush=True, color=False)
         move_cursor_to_index()
