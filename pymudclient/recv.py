@@ -35,11 +35,11 @@ def _triggers(trigger_list, content=''):
         if not match:
             continue
 
-        if trigger.data:
+        if trigger.data is not None:
             send_to_host(trigger.data, display=False)
-        elif trigger.func:
+        elif trigger.func is not None:
             data = trigger.func(match.groups())
-            if data:
+            if data is not None:
                 send_to_host(data, display=False)
 
 
