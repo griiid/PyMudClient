@@ -18,15 +18,8 @@ kb = KBHit()
 alias_list = None
 
 
-def _getch():
-    if not kb.kbhit():
-        return None
-    return kb.getch()
-
-
 def _input_visible(char, char_ord):
-    '''ASCII 可視字元 或 中文字'''
-
+    # 不是ASCII 可視字元 或 中文字
     if char_ord < 0x20 or 0x7E < char_ord < 0x4E00 or 0x9FA5 < char_ord:
         return
 
@@ -43,7 +36,7 @@ def _input_ctrl_c(_, char_ord):
     if char_ord != 0x03:
         return False
 
-    g_input['is_running'] = False
+    g_is_running.set(False),
     color_print('\r\n$HIY$中斷程式$NOR$')
     return True
 
@@ -213,6 +206,7 @@ class TimerProcessor:
 
 INPUT_FUNCTION_LIST = [
     _input_visible,
+    _input_ctrl_c,
     _input_0x1B,
     _input_backspace,
     _input_enter,
@@ -225,7 +219,7 @@ def thread_job_input_cmd(alias_list_, timer_list):
     timer_processor = TimerProcessor(timer_list)
 
     while g_is_running.get() and not g_is_reconnect.get():
-        char = _getch()
+        char = kb.getch()
         if char is None:
             timer_processor.process()
             time.sleep(0.01)
