@@ -108,7 +108,6 @@ class KBHit:
             except Exception:
                 return None
 
-    # TODO: Implement
     def detect_special_key(self):
         if self._last_ch_ord == 0x03:
             return self.Key.CTRL_C

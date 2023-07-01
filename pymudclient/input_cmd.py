@@ -29,13 +29,10 @@ def _input_visible(key, key_ord, is_special_key):
     if g_input['last_send'] != '':
         g_input['last_send'] = ''
 
-    g_input['input'] = (
-        g_input['input'][:g_input['input_index']] + key + g_input['input'][g_input['input_index']:]
-    )
+    g_input['input'] = g_input['input'][:g_input['input_index']] + key + g_input['input'][g_input['input_index']:]
     g_input['input_index'] += 1
 
 
-# TODO: Implement
 def _input_speicial_keys(key, key_ord, is_special_key):
     # 不是 speical key，不在這邊處理
     if not is_special_key:
@@ -91,9 +88,7 @@ def _process_backspace():
     if g_input['last_send'] != '':
         g_input['last_send'] = ''
     elif g_input['input_index'] > 0:
-        g_input['input'] = (
-            g_input['input'][:g_input['input_index'] - 1] + g_input['input'][g_input['input_index']:]
-        )
+        g_input['input'] = (g_input['input'][:g_input['input_index'] - 1] + g_input['input'][g_input['input_index']:])
         g_input['input_index'] -= 1
 
 
@@ -116,10 +111,7 @@ def _process_delete():
     if g_input['last_send'] != '':
         g_input['last_send'] = ''
     else:
-        g_input['input'] = (
-            g_input['input'][:g_input['input_index']] +
-            g_input['input'][g_input['input_index'] + 1:]
-        )
+        g_input['input'] = (g_input['input'][:g_input['input_index']] + g_input['input'][g_input['input_index'] + 1:])
 
 
 def _process_right():
