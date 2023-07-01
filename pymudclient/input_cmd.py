@@ -13,8 +13,6 @@ from .shared_data import (
 from .utils.print import color_print
 from .utils.telnet import send_to_host
 
-kb = KBHit()
-
 alias_list = None
 
 
@@ -225,6 +223,7 @@ def thread_job_input_cmd(alias_list_, timer_list):
     global alias_list
     alias_list = alias_list_
     timer_processor = TimerProcessor(timer_list)
+    kb = KBHit()
 
     while g_is_running.get() and not g_is_reconnect.get():
         key = kb.getch()
@@ -248,3 +247,5 @@ def thread_job_input_cmd(alias_list_, timer_list):
                 return
 
         show_input()
+
+    kb.set_normal_term()
