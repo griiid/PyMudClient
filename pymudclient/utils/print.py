@@ -1,3 +1,5 @@
+import fcntl
+import os
 import sys
 
 from ..shared_data import g_input
@@ -5,6 +7,23 @@ from .codec import enc
 from .colors import color_convert
 
 # ANSI Escape Code: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+
+
+class UnblockTTY:
+
+    def __enter__(self):
+        self.fd = sys.stdin.fileno()
+        self.flags_save = fcntl.fcntl(self.fd, fcntl.F_GETFL)
+        flags = self.flags_save & ~os.O_NONBLOCK
+        fcntl.fcntl(self.fd, fcntl.F_SETFL, flags)
+
+    def __exit__(self, *args):
+        fcntl.fcntl(self.fd, fcntl.F_SETFL, self.flags_save)
+
+
+def _unblock_print(*args, **kwargs):
+    with UnblockTTY():
+        print(*args, **kwargs)
 
 
 def _set_end(kwargs):
@@ -15,14 +34,14 @@ def _set_end(kwargs):
 def color_print(text, *args, **kwargs):
     text = color_convert(text)
     _set_end(kwargs)
-    print(text, *args, **kwargs)
+    _unblock_print(text, *args, **kwargs)
 
 
 def replace_line_print(text, color=True, *args, **kwargs):
     if color:
         color_print(f'\x1B[2K\r{text}\x1B[m', *args, **kwargs)
     else:
-        print(f'\x1B[2K\r{text}\x1B[m', *args, **kwargs)
+        _unblock_print(f'\x1B[2K\r{text}\x1B[m', *args, **kwargs)
 
 
 def move_cursor_to_index():
