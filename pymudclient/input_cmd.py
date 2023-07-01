@@ -18,31 +18,42 @@ kb = KBHit()
 alias_list = None
 
 
-def _input_visible(char, char_ord):
+def _input_visible(key, key_ord, is_special_key):
+    # speical key，不在這邊處理
+    if is_special_key:
+        return
+
     # 不是ASCII 可視字元 或 中文字
-    if char_ord < 0x20 or 0x7E < char_ord < 0x4E00 or 0x9FA5 < char_ord:
+    if key_ord < 0x20 or 0x7E < key_ord < 0x4E00 or 0x9FA5 < key_ord:
         return
 
     if g_input['last_send'] != '':
         g_input['last_send'] = ''
 
     g_input['input'] = (
-        g_input['input'][:g_input['input_index']] + char + g_input['input'][g_input['input_index']:]
+        g_input['input'][:g_input['input_index']] + key + g_input['input'][g_input['input_index']:]
     )
     g_input['input_index'] += 1
 
 
-def _input_ctrl_c(_, char_ord):
-    if char_ord != 0x03:
-        return False
+# TODO: Implement
+def _input_speicial_keys(key, key_ord, is_special_key):
+    # 不是 speical key，不在這邊處理
+    if not is_special_key:
+        return
 
+    if key == KBHit.Key.CTRL_C:
+        _process_ctrl_c()
+
+
+def _process_ctrl_c():
     g_is_running.set(False),
     color_print('\r\n$HIY$中斷程式$NOR$')
     return True
 
 
-def _input_0x1B(_, char_ord):
-    if char_ord != 0x1B:
+def _input_0x1B(_, key_ord, is_special_key):
+    if key_ord != 0x1B:
         # Not Special Command
         return
 
@@ -95,8 +106,8 @@ def _input_0x1B(_, char_ord):
             g_input['input_index'] = 0
 
 
-def _input_backspace(_, char_ord):
-    if char_ord != 0x7F:
+def _input_backspace(_, key_ord, is_special_key):
+    if key_ord != 0x7F:
         # Not Backspace
         return
 
@@ -160,8 +171,8 @@ def _alias_function(text):
     return text
 
 
-def _input_enter(_, char_ord):
-    if char_ord in {0x0A, 0x0D}:    # Enter
+def _input_enter(_, key_ord, is_special_key):
+    if key_ord in {0x0A, 0x0D}:    # Enter
         if g_input['last_send'] != '':
             g_input['input'] = g_input['last_send']
         else:
@@ -206,7 +217,7 @@ class TimerProcessor:
 
 INPUT_FUNCTION_LIST = [
     _input_visible,
-    _input_ctrl_c,
+    _input_speicial_keys,
     _input_0x1B,
     _input_backspace,
     _input_enter,
@@ -219,16 +230,24 @@ def thread_job_input_cmd(alias_list_, timer_list):
     timer_processor = TimerProcessor(timer_list)
 
     while g_is_running.get() and not g_is_reconnect.get():
-        char = kb.getch()
-        if char is None:
+        key = kb.getch()
+        if key is None:
             timer_processor.process()
             time.sleep(0.01)
             continue
 
-        char_ord = ord(char)
+        #
+        special_key = kb.detect_special_key()
+        if special_key:
+            is_special_key = True
+            key = special_key
+            key_ord = None
+        else:
+            is_special_key = False
+            key_ord = ord(key)
 
         for func in INPUT_FUNCTION_LIST:
-            if func(char, char_ord):
+            if func(key, key_ord, is_special_key):
                 return
 
         show_input()
