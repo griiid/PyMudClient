@@ -55,6 +55,9 @@ def thread_start(alias_list, trigger_list, timer_list):
 
 
 def thread_wait_close(thread_list):
+    if not thread_list:
+        return
+
     color_print(f'$HIY$等待 {len(thread_list)} 個 thread 關閉...$NOR$')
     for thread, name in thread_list:
         thread.join()
