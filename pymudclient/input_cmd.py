@@ -45,7 +45,7 @@ def _input_speicial_keys(key, key_ord, is_special_key):
         _process_ctrl_c()
     elif key == KBHit.Key.CTRL_W:
         _process_ctrl_w()
-    elif key == KBHit.Key.BACKSPACE:
+    elif key in {KBHit.Key.BACKSPACE, KBHit.Key.CTRL_H}:
         _process_backspace()
     elif key == KBHit.Key.ENTER:
         _process_enter()

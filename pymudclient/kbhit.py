@@ -21,6 +21,7 @@ class KBHit:
         'Key',
         [
             'CTRL_C',
+            'CTRL_H',
             'CTRL_W',
             'ESC',
             'HOME',
@@ -115,6 +116,8 @@ class KBHit:
             return self.Key.BACKSPACE
         if self._last_ch_ord in {0x0A, 0x0D}:
             return self.Key.ENTER
+        if self._last_ch_ord == 0x08:
+            return self.Key.CTRL_H
         if self._last_ch_ord == 0x17:
             return self.Key.CTRL_W
         if self._last_ch_ord == 0x1B:
