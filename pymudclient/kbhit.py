@@ -1,3 +1,4 @@
+import fcntl
 import os
 from enum import Enum
 from functools import wraps
@@ -57,6 +58,12 @@ class KBHit:
         attr_new[3] &= ~termios.ECHO
         termios.tcsetattr(self.fd, termios.TCSANOW, attr_new)
 
+        # Get the file access mode and the file status flags of
+        # file control (fcntl)
+        self.orig_fl = fcntl.fcntl(self.fd, fcntl.F_GETFL)
+        # Set the file status flags to O_NONBLOCK
+        fcntl.fcntl(self.fd, fcntl.F_SETFL, self.orig_fl | os.O_NONBLOCK)
+
     def set_normal_term(self):
         ''' Resets to normal terminal.  On Windows this is a no-op.
         '''
@@ -65,6 +72,7 @@ class KBHit:
             pass
         else:
             termios.tcsetattr(self.fd, termios.TCSANOW, self.attr_origin)
+            fcntl.fcntl(self.fd, fcntl.F_SETFL, self.orig_fl)
 
     def _save_last_ch(func):
 
@@ -88,7 +96,7 @@ class KBHit:
             return msvcrt.getch().decode('utf-8')
         else:
             try:
-                return sys.stdin.read(1)
+                return sys.stdin.read(1) or None
             except BlockingIOError:
                 return None
             except Exception:
@@ -105,14 +113,19 @@ class KBHit:
 # Test
 if __name__ == "__main__":
 
+    import time
+
     kb = KBHit()
 
     print('Hit any key, or ctrl-c to exit')
 
     while True:
         ch = kb.getch()
-        print(repr(ch))
+        if ch is None:
+            time.sleep(0.01)
+            continue
 
+        print(repr(ch))
         if ord(ch) == 0x03:
             # ctr-c
             break
