@@ -46,66 +46,22 @@ def _input_speicial_keys(key, key_ord, is_special_key):
         _process_backspace()
     elif key == KBHit.Key.ENTER:
         _process_enter()
+    elif key == KBHit.Key.DELETE:
+        _process_delete()
+    elif key == KBHit.Key.RIGHT:
+        _process_right()
+    elif key == KBHit.Key.LEFT:
+        _process_left()
+    elif key == KBHit.Key.HOME:
+        _process_home()
+    elif key == KBHit.Key.END:
+        _process_end()
 
 
 def _process_ctrl_c():
     g_is_running.set(False),
     color_print('\r\n$HIY$中斷程式$NOR$')
     return True
-
-
-def _input_0x1B(_, key_ord, is_special_key):
-    if key_ord != 0x1B:
-        # Not Special Command
-        return
-
-    next1, next2 = ord(sys.stdin.read(1)), ord(sys.stdin.read(1))
-    if next1 != 91:
-        return
-
-    if next2 == 51:
-        next3 = ord(sys.stdin.read(1))
-        if next3 == 126:
-            # Delete
-            if g_input['last_send'] != '':
-                g_input['last_send'] = ''
-            else:
-                g_input['input'] = (
-                    g_input['input'][:g_input['input_index']] +
-                    g_input['input'][g_input['input_index'] + 1:]
-                )
-    elif next2 == 68:
-        # Left
-        if g_input['last_send'] != '':
-            g_input['input'] = g_input['last_send']
-            g_input['input_index'] = len(g_input['last_send']) - 1
-            g_input['last_send'] = ''
-        else:
-            g_input['input_index'] = max(0, g_input['input_index'] - 1)
-    elif next2 == 67:
-        # Right
-        if g_input['last_send'] != '':
-            g_input['input'] = g_input['last_send']
-            g_input['input_index'] = len(g_input['last_send'])
-            g_input['last_send'] = ''
-        else:
-            g_input['input_index'] = min(len(g_input['input']), g_input['input_index'] + 1)
-    elif next2 == 70:
-        # End
-        if g_input['last_send'] != '':
-            g_input['input'] = g_input['last_send']
-            g_input['input_index'] = len(g_input['last_send'])
-            g_input['last_send'] = ''
-        else:
-            g_input['input_index'] = len(g_input['input'])
-    elif next2 == 72:
-        # Home
-        if g_input['last_send'] != '':
-            g_input['input'] = g_input['last_send']
-            g_input['input_index'] = 0
-            g_input['last_send'] = ''
-        else:
-            g_input['input_index'] = 0
 
 
 def _process_backspace():
@@ -116,6 +72,67 @@ def _process_backspace():
             g_input['input'][:g_input['input_index'] - 1] + g_input['input'][g_input['input_index']:]
         )
         g_input['input_index'] -= 1
+
+
+def _process_enter():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+    else:
+        g_input['last_send'] = g_input['input']
+
+    text = g_input['input']
+    text = _alias_function(text)
+    if text:
+        send_to_host(text)
+
+    g_input['input'] = ''
+    g_input['input_index'] = 0
+
+
+def _process_delete():
+    if g_input['last_send'] != '':
+        g_input['last_send'] = ''
+    else:
+        g_input['input'] = (
+            g_input['input'][:g_input['input_index']] +
+            g_input['input'][g_input['input_index'] + 1:]
+        )
+
+
+def _process_right():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+        g_input['input_index'] = len(g_input['last_send'])
+        g_input['last_send'] = ''
+    else:
+        g_input['input_index'] = min(len(g_input['input']), g_input['input_index'] + 1)
+
+
+def _process_left():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+        g_input['input_index'] = len(g_input['last_send']) - 1
+        g_input['last_send'] = ''
+    else:
+        g_input['input_index'] = max(0, g_input['input_index'] - 1)
+
+
+def _process_home():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+        g_input['input_index'] = 0
+        g_input['last_send'] = ''
+    else:
+        g_input['input_index'] = 0
+
+
+def _process_end():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+        g_input['input_index'] = len(g_input['last_send'])
+        g_input['last_send'] = ''
+    else:
+        g_input['input_index'] = len(g_input['input'])
 
 
 def _alias_pattern_process(start_text, pattern, text):
@@ -169,21 +186,6 @@ def _alias_function(text):
     return text
 
 
-def _process_enter():
-    if g_input['last_send'] != '':
-        g_input['input'] = g_input['last_send']
-    else:
-        g_input['last_send'] = g_input['input']
-
-    text = g_input['input']
-    text = _alias_function(text)
-    if text:
-        send_to_host(text)
-
-    g_input['input'] = ''
-    g_input['input_index'] = 0
-
-
 @dataclass
 class _Timer:
 
@@ -215,7 +217,6 @@ class TimerProcessor:
 INPUT_FUNCTION_LIST = [
     _input_visible,
     _input_speicial_keys,
-    _input_0x1B,
 ]
 
 

@@ -22,11 +22,14 @@ class KBHit:
         [
             'CTRL_C',
             'ESC',
+            'HOME',
+            'END',
             'UP',
             'DOWN',
             'LEFT',
             'RIGHT',
             'BACKSPACE',
+            'DELETE',
             'ENTER',
         ],
     )
@@ -111,6 +114,40 @@ class KBHit:
             return self.Key.BACKSPACE
         if self._last_ch_ord in {0x0A, 0x0D}:
             return self.Key.ENTER
+        if self._last_ch_ord == 0x17:
+            return self.Key.CTRL_W
+        if self._last_ch_ord == 0x1B:
+            return self._process_0x1B()
+
+        return None
+
+    def _process_0x1B(self):
+        next1, next2, next3 = self.getch(), self.getch(), self.getch()
+        next1_ord = ord(next1) if next1 else None
+        next2_ord = ord(next2) if next2 else None
+        next3_ord = ord(next3) if next3 else None
+
+        if next1_ord == None:
+            return self.Key.ESC
+        if next1_ord == 0x5B:
+            return self._process_0x1B_0x5B(next2_ord, next3_ord)
+
+        return None
+
+    def _process_0x1B_0x5B(self, next2_ord, next3_ord):
+        if next2_ord == 0x33:
+            if next3_ord == 0x7E:
+                return self.Key.DELETE
+        elif next2_ord == 0x43:
+            return self.Key.RIGHT
+        elif next2_ord == 0x44:
+            return self.Key.LEFT
+        elif next2_ord == 0x46:
+            return self.Key.END
+        elif next2_ord == 0x48:
+            return self.Key.HOME
+
+        return None
 
 
 # Test
