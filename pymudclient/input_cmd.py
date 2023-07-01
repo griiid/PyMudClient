@@ -46,6 +46,8 @@ def _input_speicial_keys(key, key_ord, is_special_key):
         _process_ctrl_c()
     elif key == KBHit.Key.BACKSPACE:
         _process_backspace()
+    elif key == KBHit.Key.ENTER:
+        _process_enter()
 
 
 def _process_ctrl_c():
@@ -169,20 +171,19 @@ def _alias_function(text):
     return text
 
 
-def _input_enter(_, key_ord, is_special_key):
-    if key_ord in {0x0A, 0x0D}:    # Enter
-        if g_input['last_send'] != '':
-            g_input['input'] = g_input['last_send']
-        else:
-            g_input['last_send'] = g_input['input']
+def _process_enter():
+    if g_input['last_send'] != '':
+        g_input['input'] = g_input['last_send']
+    else:
+        g_input['last_send'] = g_input['input']
 
-        text = g_input['input']
-        text = _alias_function(text)
-        if text:
-            send_to_host(text)
+    text = g_input['input']
+    text = _alias_function(text)
+    if text:
+        send_to_host(text)
 
-        g_input['input'] = ''
-        g_input['input_index'] = 0
+    g_input['input'] = ''
+    g_input['input_index'] = 0
 
 
 @dataclass
@@ -217,7 +218,6 @@ INPUT_FUNCTION_LIST = [
     _input_visible,
     _input_speicial_keys,
     _input_0x1B,
-    _input_enter,
 ]
 
 

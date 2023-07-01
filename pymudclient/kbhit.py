@@ -27,6 +27,7 @@ class KBHit:
             'LEFT',
             'RIGHT',
             'BACKSPACE',
+            'ENTER',
         ],
     )
 
@@ -108,6 +109,8 @@ class KBHit:
             return self.Key.CTRL_C
         if self._last_ch_ord == 0x7F:
             return self.Key.BACKSPACE
+        if self._last_ch_ord in {0x0A, 0x0D}:
+            return self.Key.ENTER
 
 
 # Test
