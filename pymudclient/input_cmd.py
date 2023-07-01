@@ -1,3 +1,4 @@
+import re
 import sys
 import time
 from dataclasses import dataclass
@@ -42,6 +43,8 @@ def _input_speicial_keys(key, key_ord, is_special_key):
 
     if key == KBHit.Key.CTRL_C:
         _process_ctrl_c()
+    elif key == KBHit.Key.CTRL_W:
+        _process_ctrl_w()
     elif key == KBHit.Key.BACKSPACE:
         _process_backspace()
     elif key == KBHit.Key.ENTER:
@@ -62,6 +65,26 @@ def _process_ctrl_c():
     g_is_running.set(False),
     color_print('\r\n$HIY$中斷程式$NOR$')
     return True
+
+
+def _process_ctrl_w():
+    if g_input['last_send'] != '':
+        g_input['last_send'] = ''
+    elif g_input['input_index'] > 0:
+        head_origin = g_input['input'][:g_input['input_index']]
+        tail = g_input['input'][g_input['input_index']:]
+
+        head_for_process = head_origin
+        if head_for_process[-1] == ' ':
+            head_for_process = head_for_process.rstrip()
+
+        re_match = re.search(r'(\s+)(.*)', head_for_process[::-1])
+        if re_match is None:
+            head_new = ''
+        else:
+            head_new = ''.join(re_match.groups())[::-1]
+        g_input['input'] = head_new + tail
+        g_input['input_index'] -= len(head_origin) - len(head_new)
 
 
 def _process_backspace():

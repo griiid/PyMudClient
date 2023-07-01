@@ -21,6 +21,7 @@ class KBHit:
         'Key',
         [
             'CTRL_C',
+            'CTRL_W',
             'ESC',
             'HOME',
             'END',
