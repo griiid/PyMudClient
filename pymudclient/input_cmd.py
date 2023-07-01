@@ -102,6 +102,8 @@ def _process_enter():
     text = _alias_function(text)
     if text:
         send_to_host(text)
+    else:
+        send_to_host('')
 
     g_input['input'] = ''
     g_input['input_index'] = 0
