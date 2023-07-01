@@ -44,6 +44,8 @@ def _input_speicial_keys(key, key_ord, is_special_key):
 
     if key == KBHit.Key.CTRL_C:
         _process_ctrl_c()
+    elif key == KBHit.Key.BACKSPACE:
+        _process_backspace()
 
 
 def _process_ctrl_c():
@@ -106,11 +108,7 @@ def _input_0x1B(_, key_ord, is_special_key):
             g_input['input_index'] = 0
 
 
-def _input_backspace(_, key_ord, is_special_key):
-    if key_ord != 0x7F:
-        # Not Backspace
-        return
-
+def _process_backspace():
     if g_input['last_send'] != '':
         g_input['last_send'] = ''
     elif g_input['input_index'] > 0:
@@ -219,7 +217,6 @@ INPUT_FUNCTION_LIST = [
     _input_visible,
     _input_speicial_keys,
     _input_0x1B,
-    _input_backspace,
     _input_enter,
 ]
 
