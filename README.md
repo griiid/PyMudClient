@@ -99,7 +99,14 @@ run(host, port, alias_list=None, trigger_list=None, timer_list=None)
 
 - start_text `string`: Alias 的指令，可以包含空格。
 - pattern `string`: (optional) 要替換的指令，會傳到 host。
-- func `function`: (optional) 要呼叫的 function，會傳一個 `text` 參數，會把除了 start_text 外的後面的文字全部傳入；如果 function 有回傳文字，會傳給 host。
+- func `function`: (optional) 要呼叫的 function。
+  - function prototype:
+    ```py
+    def func(text: str) -> str or None:
+      ...
+    ```
+  - `text` 參數會把除了 start_text 外的後面的文字全部傳入。
+  - 如果 function 有回傳文字，會傳給 host。
 
 pattern 跟 func 2 選 1。
 
@@ -125,15 +132,23 @@ ALIAS_LIST = [
 
 - pattern `string`: 觸發的 pattern，使用 regex。
 - data `string`: (optional) 要直接送出的文字，如果是固定文字用這個就好。
-- func `function`: (optional) 要呼叫的 function，會傳一個 `match` 參數，會把 regex match 到的 `match.groups()` 傳入；如果 function 有回傳文字，會傳給 host。
+- func `function`: (optional) 要呼叫的 function。
+  - function prototype:
+    ```py
+    def func(text: str, match_group: list) -> str or None:
+        ...
+    ```
+  - `text` 參數會把有符合 trigger 條件的整行文字傳入。
+  - `match_group` 參數會把 regex match 到的 `match.groups()` 傳入
+  - 如果 function 有回傳文字，會傳給 host。
 
 #### 使用範例
 
 ```py
 from pymudclient import Trigger
 
-def summon(match):
-    return f'summon {match[0]}'
+def summon(text, match_group):
+    return f'summon {match_group[0]}'
 
 TRIGGER_LIST = [
     Trigger(r"^您的英文名字\(新人物請輸入\'new\'\) :$", data=USER),
@@ -151,7 +166,13 @@ TRIGGER_LIST = [
 
 - seconds `number`: 多久執行一次，單位是秒。
 - data `string`: (optional) 要直接送出的文字，如果是固定文字用這個就好。
-- func `function`: (optional) 要呼叫的 function；如果 function 有回傳文字，會傳給 host。
+- func `function`: (optional) 要呼叫的 function。
+  - function prototype:
+    ```py
+    def func() -> str or None:
+      ...
+    ```
+  - 如果 function 有回傳文字，會傳給 host。
 
 #### 使用範例
 
