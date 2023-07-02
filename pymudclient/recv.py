@@ -38,7 +38,7 @@ def _triggers(trigger_list, content=''):
         if trigger.data is not None:
             send_to_host(trigger.data, display=False)
         elif trigger.func is not None:
-            data = trigger.func(match.groups())
+            data = trigger.func(content_text_only, match.groups())
             if data is not None:
                 send_to_host(data, display=False)
 
