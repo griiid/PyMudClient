@@ -50,8 +50,9 @@
 ## 使用範例
 
 ```py
+import pymudclient as mud
+
 from aliases import ALIAS_LIST
-import pymudclient
 from settings import (
     HOST,
     PORT,
