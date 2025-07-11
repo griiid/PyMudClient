@@ -10,16 +10,21 @@ SPLIT_BEFORE_FIRST_ARGUMENT = true
 SPLIT_BEFORE_CLOSING_BRACKET = true
 # 結尾括號不縮排
 DEDENT_CLOSING_BRACKETS = true
+SPLIT_ARGUMENTS_WHEN_COMMA_TERMINATED = true
 
 [tool.pytest.ini_options]
 addopts = "--ds=scrm.settings --reuse-db"
 python_files = "tests.py test_*.py"
 
 [tool.isort]
-# length_sort_stdlib=true
-src_paths=["isort","test"]
+src_paths=["."]
 multi_line_output=3
 force_grid_wrap=2
 include_trailing_comma=true
-known_local_folder=[]
-sections=["FUTURE", "STDLIB", "FIRSTPARTY", "THIRDPARTY", "LOCALFOLDER"]
+sections=[
+    "FUTURE",
+    "STDLIB",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]
