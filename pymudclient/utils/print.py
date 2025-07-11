@@ -2,9 +2,9 @@ import fcntl
 import os
 import sys
 
-from ..shared_data import g_input
-from .codec import enc
-from .colors import color_convert
+from pymudclient.shared_data import g_input
+from pymudclient.utils.codec import enc
+from pymudclient.utils.colors import color_convert
 
 # ANSI Escape Code: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 

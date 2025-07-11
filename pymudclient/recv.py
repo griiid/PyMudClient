@@ -1,25 +1,25 @@
 import re
 import time
 
-from .display import show_input
-from .shared_data import (
+from pymudclient.display import show_input
+from pymudclient.shared_data import (
     g_is_reconnect,
     g_is_running,
     g_tn,
 )
-from .utils.codec import (
+from pymudclient.utils.codec import (
     dec,
     enc,
 )
-from .utils.colors import (
+from pymudclient.utils.colors import (
     color_convert,
     remove_strange_color_code,
 )
-from .utils.print import (
+from pymudclient.utils.print import (
     color_print,
     replace_line_print,
 )
-from .utils.telnet import send_to_host
+from pymudclient.utils.telnet import send_to_host
 
 ansi_escape = re.compile(r'\x1b\[[^m]*m')
 

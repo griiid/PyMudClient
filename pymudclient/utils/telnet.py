@@ -1,7 +1,7 @@
-from ..shared_data import g_tn
-from .codec import enc
-from .colors import color_convert
-from .print import (
+from pymudclient.shared_data import g_tn
+from pymudclient.utils.codec import enc
+from pymudclient.utils.colors import color_convert
+from pymudclient.utils.print import (
     color_print,
     replace_line_print,
 )

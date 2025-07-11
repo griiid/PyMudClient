@@ -2,14 +2,14 @@ import telnetlib
 import threading
 import time
 
-from .input_cmd import thread_job_input_cmd
-from .recv import thread_job_recv
-from .shared_data import (
+from pymudclient.input_cmd import thread_job_input_cmd
+from pymudclient.recv import thread_job_recv
+from pymudclient.shared_data import (
     g_is_reconnect,
     g_is_running,
     g_tn,
 )
-from .utils.print import color_print
+from pymudclient.utils.print import color_print
 
 
 def excepthook(args):
