@@ -1,18 +1,17 @@
 import re
-import sys
 import time
 from dataclasses import dataclass
 from typing import Callable
 
-from .display import show_input
-from .kbhit import KBHit
-from .shared_data import (
+from pymudclient.display import show_input
+from pymudclient.kbhit import KBHit
+from pymudclient.shared_data import (
     g_input,
     g_is_reconnect,
     g_is_running,
 )
-from .utils.print import color_print
-from .utils.telnet import send_to_host
+from pymudclient.utils.print import color_print
+from pymudclient.utils.telnet import send_to_host
 
 alias_list = None
 

@@ -1,5 +1,5 @@
-from .shared_data import g_input
-from .utils.print import (
+from pymudclient.shared_data import g_input
+from pymudclient.utils.print import (
     move_cursor_to_index,
     replace_line_print,
 )
