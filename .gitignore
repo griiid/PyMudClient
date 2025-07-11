@@ -215,3 +215,10 @@ cython_debug/
 #.idea/
 
 .python-version
+
+# Development Local Test Files
+main.py
+aliases.py
+settings.py
+timers.py
+triggers.py
