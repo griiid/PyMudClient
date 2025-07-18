@@ -7,10 +7,7 @@ from pymudclient.shared_data import (
     g_is_running,
     g_tn,
 )
-from pymudclient.utils.codec import (
-    dec,
-    enc,
-)
+from pymudclient.utils.codec import dec
 from pymudclient.utils.colors import (
     color_convert,
     remove_strange_color_code,
@@ -19,7 +16,10 @@ from pymudclient.utils.print import (
     color_print,
     replace_line_print,
 )
-from pymudclient.utils.telnet import send_to_host
+from pymudclient.utils.telnet import (
+    TelnetClient,
+    send_to_host,
+)
 
 ansi_escape = re.compile(r'\x1b\[[^m]*m')
 
@@ -56,13 +56,13 @@ def thread_job_recv(trigger_list):
             last_time = time.time()
             while time.time() - last_time < 0.1:
                 data += g_tn.get().read_very_eager()
-                time.sleep(0.01)
+                time.sleep(0.001)
 
             data = remove_strange_color_code(data)
-            content_list = dec(data).split('\r\n')
+            data = TelnetClient.re_decode(data)
+            content_list = data.split('\r\n')
 
             for content in content_list:
-                content = dec(enc(content))
                 replace_line_print(content)
 
                 _triggers(trigger_list, content)
@@ -75,3 +75,6 @@ def thread_job_recv(trigger_list):
         except OSError:
             color_print(color_convert('$HIR$無法連線$NOR$'))
             g_is_reconnect.set(True)
+        except Exception:
+            import traceback
+            print(traceback.format_exc())

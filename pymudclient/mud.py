@@ -1,4 +1,3 @@
-import telnetlib
 import threading
 import time
 
@@ -10,6 +9,7 @@ from pymudclient.shared_data import (
     g_tn,
 )
 from pymudclient.utils.print import color_print
+from pymudclient.utils.telnet import TelnetClient
 
 
 def excepthook(args):
@@ -25,7 +25,7 @@ def login(host, port):
         if time.time() - try_start < 3:
             try:
                 color_print(f'開始嘗試連線至 $HIY${host}:{port}$NOR$', flush=True)
-                g_tn.set(telnetlib.Telnet(host, port))
+                g_tn.set(TelnetClient(host, port))
                 break
             except Exception:
                 color_print('$HIR$連線失敗，三秒內將繼續重試$NOR$', flush=True)
