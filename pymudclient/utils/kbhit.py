@@ -45,6 +45,8 @@ class KBHit:
             self._posix_setup()
 
     def _posix_setup(self):
+        self.buffer = ''
+
         self.fd = sys.stdin.fileno()
 
         # Get origin tty control I/O attributes
@@ -102,13 +104,25 @@ class KBHit:
                 return None
             return msvcrt.getch().decode('utf-8')
         else:
+            # 如果 buffer 還有值，就從裡面取出一個字元回傳
+            if self.buffer:
+                char, self.buffer = self.buffer[0], self.buffer[1:]
+                return char
+
             # 使用 select 來實現 0.01 秒超時
             ready, _, _ = select.select([sys.stdin], [], [], 0.01)
             if not ready:
                 return None
 
             try:
-                return sys.stdin.read(1) or None
+                # 把 stdin 所有的值都讀進來先放到 buffer
+                self.buffer = sys.stdin.read()
+                if not self.buffer:
+                    return None
+
+                # 取出 buffer 的第一個字元回傳，剩下的繼續放在 buffer 裡面
+                char, self.buffer = self.buffer[0], self.buffer[1:]
+                return char
             except BlockingIOError:
                 return None
             except Exception:
