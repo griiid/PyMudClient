@@ -1,5 +1,6 @@
 import fcntl
 import os
+import select
 from enum import Enum
 from functools import wraps
 
@@ -101,6 +102,11 @@ class KBHit:
                 return None
             return msvcrt.getch().decode('utf-8')
         else:
+            # 使用 select 來實現 0.01 秒超時
+            ready, _, _ = select.select([sys.stdin], [], [], 0.01)
+            if not ready:
+                return None
+
             try:
                 return sys.stdin.read(1) or None
             except BlockingIOError:
