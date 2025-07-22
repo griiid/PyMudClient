@@ -1,3 +1,23 @@
+class MudColorAlias():
+
+    NORMAL = '$NOR$'
+    BLACK = '$BLK$'
+    RED = '$RED$'
+    GREEN = '$GRN$'
+    YELLOW = '$YEL$'
+    BLUE = '$BLU$'
+    MAGENTA = '$MAG$'
+    CYAN = '$CYN$'
+    WHITE = '$WHT$'
+    HIGH_RED = '$HIR$'
+    HIGH_GREEN = '$HIG$'
+    HIGH_YELLOW = '$HIY$'
+    HIGH_BLUE = '$HIB$'
+    HIGH_MAGENTA = '$HIM$'
+    HIGH_CYAN = '$HIC$'
+    HIGH_WHITE = '$HIW$'
+
+
 _COLOR_REPLACE_MAP = [
     ('$NOR$', '\x1B[m'),
     ('$BLK$', '\x1B[30m'),

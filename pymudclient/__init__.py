@@ -4,6 +4,7 @@ from pymudclient.export_classes import (
     Trigger,
 )
 from pymudclient.mud import PyMudClient
+from pymudclient.utils.colors import MudColorAlias
 from pymudclient.utils.print import color_print
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     'Trigger',
     'Timer',
     'color_print',
+    'MudColorAlias',
 ]
