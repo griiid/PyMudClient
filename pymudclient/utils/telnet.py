@@ -1,7 +1,6 @@
 from Exscript.protocols.telnetlib import Telnet
 
-from pymudclient.shared_data import g_tn
-from pymudclient.utils.codec import enc
+from pymudclient import shared_data
 from pymudclient.utils.colors import color_convert
 from pymudclient.utils.print import (
     color_print,
@@ -9,30 +8,31 @@ from pymudclient.utils.print import (
 )
 
 
-def send_to_host(text, display=True):
+class TelnetClient:
+
+    def __init__(self, host, port, encoding='latin1'):
+        self.tn = Telnet(host, port)
+        self.encoding = encoding
+
+    def read_very_eager(self):
+        return self.tn.read_very_eager()
+
+    def re_decode(self, data):
+        return data.encode('latin1').decode(self.encoding)
+
+    def write(self, data):
+        return self.tn.write(data.encode(self.encoding))
+
+    def close(self):
+        self.tn.close()
+
+
+def send_to_host(text):
     try:
-        if display and text != '':
+        if text != '':
             replace_line_print(f'$HIM$Send: {text}')
-        g_tn.get().write(text + '\r\n')
+        shared_data.TN.get().write(text + '\r\n')
+
     except BrokenPipeError as err:
         color_print(f'$HIR$輸出錯誤: {err}$NOR$')
         exit(color_convert('$HIR$輸出模式失連$NOR$'))
-
-
-class TelnetClient:
-
-    def __init__(self, host, port):
-        self._tn = Telnet(host, port)
-
-    def read_very_eager(self):
-        return self._tn.read_very_eager()
-
-    @staticmethod
-    def re_decode(data):
-        return data.encode("latin1").decode("big5hkscs")
-
-    def write(self, data):
-        return self._tn.write(data.encode('big5hkscs'))
-
-    def close(self):
-        self._tn.close()

@@ -2,7 +2,7 @@ import fcntl
 import os
 import sys
 
-from pymudclient.shared_data import g_input
+from pymudclient import shared_data
 from pymudclient.utils.codec import enc
 from pymudclient.utils.colors import color_convert
 
@@ -45,10 +45,12 @@ def replace_line_print(text, color=True, *args, **kwargs):
 
 
 def move_cursor_to_index():
-    if g_input['input_index'] <= 0:
-        return
+    with shared_data.CURRENT_INPUT.locked():
+        current_input_index = shared_data.CURRENT_INPUT['input_index']
+        if current_input_index <= 0:
+            return
 
-    cursor_pos = len(enc(g_input['input'][:g_input['input_index']]))
-    # Move cursor to index
-    sys.stdout.write(u'\u001B[' + str(cursor_pos) + 'C')
-    sys.stdout.flush()
+        cursor_pos = len(enc(shared_data.CURRENT_INPUT['input'][:current_input_index]))
+        # Move cursor to index
+        sys.stdout.write(u'\u001B[' + str(cursor_pos) + 'C')
+        sys.stdout.flush()
