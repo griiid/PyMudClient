@@ -37,8 +37,8 @@ class KBHit:
     )
 
     def __init__(self):
-        self._last_ch = None
-        self._last_ch_ord = None
+        self._last_char = None
+        self._last_char_ord = None
 
         if os.name != 'nt':
             self._posix_setup()
@@ -80,17 +80,17 @@ class KBHit:
             termios.tcsetattr(self.fd, termios.TCSANOW, self.attr_origin)
             fcntl.fcntl(self.fd, fcntl.F_SETFL, self.orig_fl)
 
-    def _save_last_ch(func):
+    def _save_last_char(func):
 
         @wraps(func)
         def wrapper(self, *args, **kargs):
-            self._last_ch = func(self, *args, **kargs)
-            self._last_ch_ord = ord(self._last_ch) if self._last_ch else None
-            return self._last_ch
+            self._last_char = func(self, *args, **kargs)
+            self._last_char_ord = ord(self._last_char) if self._last_char else None
+            return self._last_char
 
         return wrapper
 
-    @_save_last_ch
+    @_save_last_char
     def getch(self):
         ''' Returns a keyboard character after kbhit() has been called.
             Should not be called in the same program as getarrow().
@@ -109,17 +109,17 @@ class KBHit:
                 return None
 
     def detect_special_key(self):
-        if self._last_ch_ord == 0x03:
+        if self._last_char_ord == 0x03:
             return self.Key.CTRL_C
-        if self._last_ch_ord == 0x7F:
+        if self._last_char_ord == 0x7F:
             return self.Key.BACKSPACE
-        if self._last_ch_ord in {0x0A, 0x0D}:
+        if self._last_char_ord in {0x0A, 0x0D}:
             return self.Key.ENTER
-        if self._last_ch_ord == 0x08:
+        if self._last_char_ord == 0x08:
             return self.Key.CTRL_H
-        if self._last_ch_ord == 0x17:
+        if self._last_char_ord == 0x17:
             return self.Key.CTRL_W
-        if self._last_ch_ord == 0x1B:
+        if self._last_char_ord == 0x1B:
             return self._process_0x1B()
 
         return None
