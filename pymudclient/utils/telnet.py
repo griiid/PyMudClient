@@ -1,6 +1,9 @@
 from Exscript.protocols.telnetlib import Telnet
 
-from pymudclient import shared_data
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.utils.colors import color_convert
 from pymudclient.utils.print import (
     color_print,
@@ -29,8 +32,18 @@ class TelnetClient:
 
 def send_to_host(text):
     try:
-        if text != '':
+        show_send_text = True
+
+        if text == '${PASSWORD}' and 'PASSWORD' in configs.VARIABLE_MAP:
+            text = configs.VARIABLE_MAP['PASSWORD']
+            show_send_text = False
+        else:
+            for key, value in configs.VARIABLE_MAP.items():
+                text = text.replace(f'${{{key}}}', value)
+
+        if show_send_text and text != '':
             replace_line_print(f'$HIM$Send: {text}')
+
         shared_data.TN.get().write(text + '\r\n')
 
     except BrokenPipeError as err:

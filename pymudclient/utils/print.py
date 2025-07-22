@@ -2,7 +2,10 @@ import fcntl
 import os
 import sys
 
-from pymudclient import shared_data
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.utils.codec import encode
 from pymudclient.utils.colors import color_convert
 
@@ -32,9 +35,18 @@ def _set_end(kwargs):
 
 
 def color_print(text, *args, **kwargs):
+    for key, value in configs.VARIABLE_MAP.items():
+        text = text.replace(f'${{{key}}}', value)
+
+    new_args = []
+    for arg in args:
+        for key, value in configs.VARIABLE_MAP.items():
+            arg = arg.replace(f'${{{key}}}', value)
+        new_args.append(arg)
+
     text = color_convert(text)
     _set_end(kwargs)
-    _unblock_print(text, *args, **kwargs)
+    _unblock_print(text, *new_args, **kwargs)
 
 
 def replace_line_print(text, color=True, *args, **kwargs):

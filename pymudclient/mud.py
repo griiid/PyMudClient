@@ -18,9 +18,12 @@ class PyMudClient:
         self,
         host,
         port,
+        account=None,
+        password=None,
         alias_list=None,
         trigger_list=None,
         timer_list=None,
+        variable_map=None,
         pre_process_recv_content_func=None,
         encoding='latin1',
     ):
@@ -36,6 +39,12 @@ class PyMudClient:
         self._thread_list = []
 
         shared_data.CONNECT_STATUS.set(Status.QUIT)
+
+        configs.VARIABLE_MAP = {} if variable_map is None else variable_map
+        if account is not None:
+            configs.VARIABLE_MAP['ACCOUNT'] = account
+        if password is not None:
+            configs.VARIABLE_MAP['PASSWORD'] = password
 
         configs.ENCODING = encoding
 

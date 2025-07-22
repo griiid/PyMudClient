@@ -1,1 +1,2 @@
+VARIABLE_MAP = {}
 ENCODING = 'latin1'
