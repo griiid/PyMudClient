@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from .mud import mud_run as run
+from pymudclient.mud import mud_run as run
 
 
 @dataclass
