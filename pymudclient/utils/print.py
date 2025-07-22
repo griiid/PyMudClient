@@ -3,7 +3,7 @@ import os
 import sys
 
 from pymudclient import shared_data
-from pymudclient.utils.codec import enc
+from pymudclient.utils.codec import encode
 from pymudclient.utils.colors import color_convert
 
 # ANSI Escape Code: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
@@ -50,7 +50,7 @@ def move_cursor_to_index():
         if current_input_index <= 0:
             return
 
-        cursor_pos = len(enc(shared_data.CURRENT_INPUT['input'][:current_input_index]))
+        cursor_pos = len(encode(shared_data.CURRENT_INPUT['input'][:current_input_index]))
         # Move cursor to index
         sys.stdout.write(u'\u001B[' + str(cursor_pos) + 'C')
         sys.stdout.flush()

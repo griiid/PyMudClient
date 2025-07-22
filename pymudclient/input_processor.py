@@ -90,8 +90,11 @@ class InputProcessor:
             if shared_data.CURRENT_INPUT['last_send'] != '':
                 shared_data.CURRENT_INPUT['last_send'] = ''
 
-            shared_data.CURRENT_INPUT['input'] = shared_data.CURRENT_INPUT['input'][:shared_data.CURRENT_INPUT[
-                'input_index']] + key + shared_data.CURRENT_INPUT['input'][shared_data.CURRENT_INPUT['input_index']:]
+            input_index = shared_data.CURRENT_INPUT['input_index']
+            shared_data.CURRENT_INPUT['input'] = (
+                shared_data.CURRENT_INPUT['input'][:input_index] + key +
+                shared_data.CURRENT_INPUT['input'][input_index:]
+            )
             shared_data.CURRENT_INPUT['input_index'] += 1
 
         return True
