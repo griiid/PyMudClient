@@ -4,7 +4,6 @@ import time
 from pymudclient import shared_data
 from pymudclient.display import show_input
 from pymudclient.shared_data import Status
-from pymudclient.utils.colors import color_convert
 from pymudclient.utils.print import (
     color_print,
     replace_line_print,
@@ -42,11 +41,11 @@ class RecvProcessor:
                 show_input()
 
             except EOFError:
-                color_print('$HIR$監測模式失連$NOR$')
+                color_print('$HIR$Monitor mode error$NOR$')
                 shared_data.CONNECT_STATUS.set(Status.RECONNECT)
 
             except OSError:
-                color_print(color_convert('$HIR$無法連線$NOR$'))
+                color_print('$HIR$Cannot connect$NOR$')
                 shared_data.CONNECT_STATUS.set(Status.RECONNECT)
 
             except Exception:

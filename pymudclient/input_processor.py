@@ -126,7 +126,7 @@ class InputProcessor:
     @classmethod
     def _process_ctrl_c(cls):
         shared_data.CONNECT_STATUS.set(Status.QUIT)
-        color_print('\r\n$HIY$中斷程式$NOR$')
+        color_print('\r\n$HIY$Program was interrupted$NOR$')
         return True
 
     @classmethod

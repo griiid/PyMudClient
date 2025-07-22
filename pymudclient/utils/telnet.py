@@ -34,5 +34,5 @@ def send_to_host(text):
         shared_data.TN.get().write(text + '\r\n')
 
     except BrokenPipeError as err:
-        color_print(f'$HIR$輸出錯誤: {err}$NOR$')
-        exit(color_convert('$HIR$輸出模式失連$NOR$'))
+        color_print(f'$HIR$Sent to host error: {err}$NOR$')
+        exit(color_convert('$HIR$Program was interrupted$NOR$'))

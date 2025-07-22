@@ -76,12 +76,12 @@ class PyMudClient:
                     self._thread_start()
 
                 elif shared_data.CONNECT_STATUS.get() == Status.QUIT:
-                    color_print('$HIY$關閉程式$NOR$')
+                    color_print('$HIY$Closing program...$NOR$')
                     self._thread_wait_close()
                     break
 
                 elif shared_data.CONNECT_STATUS.get() == Status.RECONNECT:
-                    color_print('$HIY$等待重新連線...$NOR$')
+                    color_print('$HIY$Waiting for reconnect...$NOR$')
 
                     try:
                         shared_data.TN.get().close()
@@ -111,17 +111,17 @@ class PyMudClient:
 
             if time.time() - start_time < 3:
                 try:
-                    color_print(f'開始嘗試連線至 $HIY${self.host}:{self.port}$NOR$', flush=True)
+                    color_print(f'Connecting to $HIY${self.host}:{self.port}$NOR$', flush=True)
                     tn = TelnetClient(self.host, self.port, encoding=configs.ENCODING)
                     shared_data.TN.set(tn)
-                    color_print('$HIY$連線成功$NOR$')
+                    color_print('$HIY$Connected$NOR$')
                     break
                 except Exception:
-                    color_print('$HIR$連線失敗，3 秒後將繼續重試$NOR$', flush=True)
+                    color_print('$HIR$Connect failed, will try again after 3 seconds$NOR$', flush=True)
                     time.sleep(3)
                     continue
             else:
-                color_print('$HIR$連線有誤，10 秒後再次嘗試$NOR$', flush=True)
+                color_print('$HIR$Connect failed, will try again after 10 seconds$NOR$', flush=True)
                 time.sleep(10)
                 start_time = time.time()
 
@@ -141,9 +141,9 @@ class PyMudClient:
         if not self._thread_list:
             return
 
-        color_print(f'$HIY$等待 {len(self._thread_list)} 個 thread 關閉...$NOR$')
+        color_print(f'$HIY$Waiting for {len(self._thread_list)} threads to close...$NOR$')
         for thread, name in self._thread_list:
             thread.join()
-            color_print(f'$CYN${name}$NOR$ 已關閉')
+            color_print(f'Thread $CYN${name}$NOR$ Closed')
 
         self._thread_list = []
