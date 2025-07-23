@@ -1,7 +1,9 @@
 from Exscript.protocols.telnetlib import Telnet
 
-from pymudclient.shared_data import g_tn
-from pymudclient.utils.codec import enc
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.utils.colors import color_convert
 from pymudclient.utils.print import (
     color_print,
@@ -9,30 +11,41 @@ from pymudclient.utils.print import (
 )
 
 
-def send_to_host(text, display=True):
-    try:
-        if display and text != '':
-            replace_line_print(f'$HIM$Send: {text}')
-        g_tn.get().write(text + '\r\n')
-    except BrokenPipeError as err:
-        color_print(f'$HIR$輸出錯誤: {err}$NOR$')
-        exit(color_convert('$HIR$輸出模式失連$NOR$'))
-
-
 class TelnetClient:
 
-    def __init__(self, host, port):
-        self._tn = Telnet(host, port)
+    def __init__(self, host, port, encoding='latin1'):
+        self.tn = Telnet(host, port)
+        self.encoding = encoding
 
     def read_very_eager(self):
-        return self._tn.read_very_eager()
+        return self.tn.read_very_eager()
 
-    @staticmethod
-    def re_decode(data):
-        return data.encode("latin1").decode("big5hkscs")
+    def re_decode(self, data):
+        return data.encode('latin1').decode(self.encoding)
 
     def write(self, data):
-        return self._tn.write(data.encode('big5hkscs'))
+        return self.tn.write(data.encode(self.encoding))
 
     def close(self):
-        self._tn.close()
+        self.tn.close()
+
+
+def send_to_host(text):
+    try:
+        show_send_text = True
+
+        if text == '${PASSWORD}' and 'PASSWORD' in configs.VARIABLE_MAP:
+            text = configs.VARIABLE_MAP['PASSWORD']
+            show_send_text = False
+        else:
+            for key, value in configs.VARIABLE_MAP.items():
+                text = text.replace(f'${{{key}}}', value)
+
+        if show_send_text and text != '':
+            replace_line_print(f'$HIM$Send: {text}')
+
+        shared_data.TN.get().write(text + '\r\n')
+
+    except BrokenPipeError as err:
+        color_print(f'$HIR$Sent to host error: {err}$NOR$')
+        exit(color_convert('$HIR$Program was interrupted$NOR$'))

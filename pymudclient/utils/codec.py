@@ -1,12 +1,9 @@
-CODEC = 'big5hkscs'
+from pymudclient import configs
 
 
-def enc(text):
+def encode(text: str):
     try:
-        return text.encode(CODEC)
+        return text.encode(configs.ENCODING)
     except:
-        print('Encode failed')
-        return ''
-
-def dec(text):
-    return text.decode(CODEC, 'ignore')
+        print('Encode failed', text, configs.ENCODING)
+        return b''
