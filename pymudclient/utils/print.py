@@ -2,8 +2,11 @@ import fcntl
 import os
 import sys
 
-from pymudclient.shared_data import g_input
-from pymudclient.utils.codec import enc
+from pymudclient import (
+    configs,
+    shared_data,
+)
+from pymudclient.utils.codec import encode
 from pymudclient.utils.colors import color_convert
 
 # ANSI Escape Code: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
@@ -32,9 +35,18 @@ def _set_end(kwargs):
 
 
 def color_print(text, *args, **kwargs):
+    for key, value in configs.VARIABLE_MAP.items():
+        text = text.replace(f'${{{key}}}', value)
+
+    new_args = []
+    for arg in args:
+        for key, value in configs.VARIABLE_MAP.items():
+            arg = arg.replace(f'${{{key}}}', value)
+        new_args.append(arg)
+
     text = color_convert(text)
     _set_end(kwargs)
-    _unblock_print(text, *args, **kwargs)
+    _unblock_print(text, *new_args, **kwargs)
 
 
 def replace_line_print(text, color=True, *args, **kwargs):
@@ -45,10 +57,12 @@ def replace_line_print(text, color=True, *args, **kwargs):
 
 
 def move_cursor_to_index():
-    if g_input['input_index'] <= 0:
-        return
+    with shared_data.CURRENT_INPUT.locked():
+        current_input_index = shared_data.CURRENT_INPUT['input_index']
+        if current_input_index <= 0:
+            return
 
-    cursor_pos = len(enc(g_input['input'][:g_input['input_index']]))
-    # Move cursor to index
-    sys.stdout.write(u'\u001B[' + str(cursor_pos) + 'C')
-    sys.stdout.flush()
+        cursor_pos = len(encode(shared_data.CURRENT_INPUT['input'][:current_input_index]))
+        # Move cursor to index
+        sys.stdout.write(u'\u001B[' + str(cursor_pos) + 'C')
+        sys.stdout.flush()

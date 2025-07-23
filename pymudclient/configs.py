@@ -1,0 +1,4 @@
+THREAD_SLEEP_TIME = 0.01
+
+VARIABLE_MAP = {}
+ENCODING = 'latin1'

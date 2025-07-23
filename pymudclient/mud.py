@@ -1,122 +1,166 @@
 import threading
 import time
+from typing import Callable
 
-from pymudclient.input_cmd import thread_job_input_cmd
-from pymudclient.recv import thread_job_recv
-from pymudclient.shared_data import (
-    g_is_reconnect,
-    g_is_running,
-    g_tn,
+from pymudclient import (
+    configs,
+    shared_data,
 )
+from pymudclient.export_classes import (
+    Alias,
+    Timer,
+    Trigger,
+)
+from pymudclient.input_processor import InputProcessor
+from pymudclient.recv_processor import RecvProcessor
+from pymudclient.shared_data import Status
+from pymudclient.timer_processor import TimerProcessor
 from pymudclient.utils.print import color_print
 from pymudclient.utils.telnet import TelnetClient
 
 
-def excepthook(args):
-    color_print(f'$HIR$Threading.excepthook: {args}$NOR$')
-    g_is_reconnect.set(True)
+class PyMudClient:
 
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        account: str | None = None,
+        password: str | None = None,
+        alias_list: list[Alias] | None = None,
+        trigger_list: list[Trigger] | None = None,
+        timer_list: list[Timer] | None = None,
+        variable_map: dict[str, str] | None = None,
+        pre_process_recv_content_func: Callable[[str], str] | None = None,
+        encoding: str = 'latin1',
+    ):
+        self.host = host
+        self.port = port
 
-def login(host, port):
-    time.sleep(0.3)
-    try_start = time.time()
-    while True:
-        time.sleep(0.1)
-        if time.time() - try_start < 3:
+        self.alias_list = [] if alias_list is None else alias_list
+        self.trigger_list = [] if trigger_list is None else trigger_list
+        self.timer_list = [] if timer_list is None else timer_list
+
+        self.pre_process_recv_content_func = pre_process_recv_content_func
+
+        self._thread_list = []
+
+        shared_data.CONNECT_STATUS.set(Status.QUIT)
+
+        configs.VARIABLE_MAP = {} if variable_map is None else variable_map
+        if account is not None:
+            configs.VARIABLE_MAP['ACCOUNT'] = account
+        if password is not None:
+            configs.VARIABLE_MAP['PASSWORD'] = password
+
+        configs.ENCODING = encoding
+
+    @property
+    def alias_list(self):
+        return self._alias_list
+
+    @alias_list.setter
+    def alias_list(self, value):
+        self._alias_list = [] if value is None else value
+
+    @property
+    def trigger_list(self):
+        return self._trigger_list
+
+    @trigger_list.setter
+    def trigger_list(self, value):
+        self._trigger_list = [] if value is None else value
+
+    @property
+    def timer_list(self):
+        return self._timer_list
+
+    @timer_list.setter
+    def timer_list(self, value):
+        self._timer_list = [] if value is None else value
+
+    def run(self):
+        shared_data.CONNECT_STATUS.set(Status.START)
+
+        while True:
             try:
-                color_print(f'開始嘗試連線至 $HIY${host}:{port}$NOR$', flush=True)
-                g_tn.set(TelnetClient(host, port))
-                break
-            except Exception:
-                color_print('$HIR$連線失敗，三秒內將繼續重試$NOR$', flush=True)
-                time.sleep(3)
-                continue
-        else:
-            color_print('$HIR$連線有誤，十秒後再次嘗試$NOR$', flush=True)
-            time.sleep(10)
-            try_start = time.time()
+                time.sleep(0.1)
 
+                if shared_data.CONNECT_STATUS.get() == Status.START:
+                    self._connect()
+                    shared_data.CONNECT_STATUS.set(Status.RUNNING)
+                    self._thread_start()
 
-def thread_start(alias_list, trigger_list, timer_list):
-    g_is_reconnect.set(False)
+                elif shared_data.CONNECT_STATUS.get() == Status.QUIT:
+                    color_print('$HIY$Closing program...$NOR$')
+                    self._thread_wait_close()
+                    break
 
-    thread_func_list = [
-        (thread_job_input_cmd, [alias_list, timer_list]),
-        (thread_job_recv, [trigger_list]),
-    ]
-    thread_list = []
+                elif shared_data.CONNECT_STATUS.get() == Status.RECONNECT:
+                    color_print('$HIY$Waiting for reconnect...$NOR$')
 
-    for func, args in thread_func_list:
-        thread = threading.Thread(target=func, args=args)
-        thread_list.append((thread, func.__name__))
-        thread.start()
+                    try:
+                        shared_data.TN.get().close()
+                    except Exception as e:
+                        color_print(f'$HIR$Telnet close error: {e}$NOR$')
+                        shared_data.CONNECT_STATUS.set(Status.QUIT)
+                        continue
 
-    return thread_list
+                    self._thread_wait_close()
 
+                    # 倒數 3 秒
+                    for i in range(3, 0, -1):
+                        color_print(f'$HIY${i}...$NOR$')
+                        time.sleep(1)
 
-def thread_wait_close(thread_list):
-    if not thread_list:
-        return
+                    shared_data.CONNECT_STATUS.set(Status.START)
 
-    color_print(f'$HIY$等待 {len(thread_list)} 個 thread 關閉...$NOR$')
-    for thread, name in thread_list:
-        thread.join()
-        color_print(f'$CYN${name}$NOR$ 已關閉')
-    thread_list.clear()
-
-
-class Status:
-    START = 0
-    RUNNING = 1
-    QUIT = 2
-
-
-def mud_run(host, port, alias_list=None, trigger_list=None, timer_list=None):
-    threading.excepthook = excepthook
-    status = Status.START
-
-    if alias_list is None:
-        alias_list = []
-    if trigger_list is None:
-        trigger_list = []
-    if timer_list is None:
-        timer_list = []
-
-    while True:
-        try:
-            time.sleep(0.5)
-
-            if status == Status.START:
-                login(host, port)
-                thread_list = thread_start(alias_list, trigger_list, timer_list)
-                status = Status.RUNNING
-            elif status == Status.QUIT:
-                g_is_running.set(False)
-                color_print('$HIY$關閉程式$NOR$')
-                thread_wait_close(thread_list)
-                break
-
-            if not g_is_running.get():
-                status = Status.QUIT
+            except KeyboardInterrupt:
+                shared_data.CONNECT_STATUS.set(Status.QUIT)
                 continue
 
-            if g_is_reconnect.get():
-                status = Status.START
-                color_print('$HIY$等待重新連線...$NOR$', flush=True)
+    def _connect(self):
+        start_time = time.time()
 
+        while True:
+            time.sleep(0.1)
+
+            if time.time() - start_time < 3:
                 try:
-                    g_tn.get().close()
-                except Exception as e:
-                    color_print(f'$HIR$Telnet close error: {e}$NOR$')
-                    status = Status.QUIT
+                    color_print(f'Connecting to $HIY${self.host}:{self.port}$NOR$', flush=True)
+                    tn = TelnetClient(self.host, self.port, encoding=configs.ENCODING)
+                    shared_data.TN.set(tn)
+                    color_print('$HIY$Connected$NOR$')
+                    break
+                except Exception:
+                    color_print('$HIR$Connect failed, will try again after 3 seconds$NOR$', flush=True)
+                    time.sleep(3)
                     continue
+            else:
+                color_print('$HIR$Connect failed, will try again after 10 seconds$NOR$', flush=True)
+                time.sleep(10)
+                start_time = time.time()
 
-                thread_wait_close(thread_list)
+    def _thread_start(self):
+        thread_func_list = [
+            (InputProcessor.process, [self.alias_list]),
+            (TimerProcessor.process, [self.timer_list]),
+            (RecvProcessor.process, [self.trigger_list, self.pre_process_recv_content_func]),
+        ]
+        self._thread_list = []
 
-                # 倒數 3 秒
-                for i in range(3, 0, -1):
-                    color_print(f'$HIY${i}...$NOR$')
-                    time.sleep(1)
-        except KeyboardInterrupt:
-            status = Status.QUIT
-            continue
+        for func, args in thread_func_list:
+            thread = threading.Thread(target=func, args=args)
+            self._thread_list.append((thread, func.__qualname__))
+            thread.start()
+
+    def _thread_wait_close(self):
+        if not self._thread_list:
+            return
+
+        color_print(f'$HIY$Waiting for {len(self._thread_list)} threads to close...$NOR$')
+        for thread, name in self._thread_list:
+            thread.join()
+            color_print(f'Thread $CYN${name}$NOR$ Closed')
+
+        self._thread_list = []

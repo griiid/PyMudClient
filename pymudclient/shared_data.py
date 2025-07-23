@@ -1,41 +1,25 @@
-import threading
+from enum import Enum
+
+from pymudclient.utils.telnet import TelnetClient
+from pymudclient.utils.thread_safe import ThreadSafe
 
 
-class _ThreadSafeData:
+class Status(Enum):
 
-    def __init__(self, data):
-        self.data = data
-        self.lock = threading.Lock()
-
-    def get(self):
-        with self.lock:
-            return self.data
-
-    def set(self, value):
-        with self.lock:
-            self.data = value
+    START = 0
+    RUNNING = 1
+    RECONNECT = 2
+    QUIT = 3
 
 
-class _ThreadSafeDict:
-
-    def __init__(self, data):
-        self.data = data
-        self.lock = threading.Lock()
-
-    def __getitem__(self, key):
-        with self.lock:
-            return self.data.get(key)
-
-    def __setitem__(self, key, value):
-        with self.lock:
-            self.data[key] = value
-
-
-g_tn = _ThreadSafeData(None)
-g_is_running = _ThreadSafeData(True)
-g_is_reconnect = _ThreadSafeData(False)
-g_input = _ThreadSafeDict({
+CONNECT_STATUS = ThreadSafe[Status](Status.QUIT)
+CURRENT_INPUT = ThreadSafe[dict[
+    str,
+    str | int,
+]]({
     'input': '',
-    'input_index': 0,
     'last_send': '',
+    'input_index': 0,
+    'current_input_index': 0,
 })
+TN = ThreadSafe[TelnetClient](None)

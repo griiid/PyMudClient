@@ -1,5 +1,6 @@
 import fcntl
 import os
+import select
 from enum import Enum
 from functools import wraps
 
@@ -37,13 +38,15 @@ class KBHit:
     )
 
     def __init__(self):
-        self._last_ch = None
-        self._last_ch_ord = None
+        self._last_char = None
+        self._last_char_ord = None
 
         if os.name != 'nt':
             self._posix_setup()
 
     def _posix_setup(self):
+        self.buffer = ''
+
         self.fd = sys.stdin.fileno()
 
         # Get origin tty control I/O attributes
@@ -80,17 +83,17 @@ class KBHit:
             termios.tcsetattr(self.fd, termios.TCSANOW, self.attr_origin)
             fcntl.fcntl(self.fd, fcntl.F_SETFL, self.orig_fl)
 
-    def _save_last_ch(func):
+    def _save_last_char(func):
 
         @wraps(func)
         def wrapper(self, *args, **kargs):
-            self._last_ch = func(self, *args, **kargs)
-            self._last_ch_ord = ord(self._last_ch) if self._last_ch else None
-            return self._last_ch
+            self._last_char = func(self, *args, **kargs)
+            self._last_char_ord = ord(self._last_char) if self._last_char else None
+            return self._last_char
 
         return wrapper
 
-    @_save_last_ch
+    @_save_last_char
     def getch(self):
         ''' Returns a keyboard character after kbhit() has been called.
             Should not be called in the same program as getarrow().
@@ -101,25 +104,42 @@ class KBHit:
                 return None
             return msvcrt.getch().decode('utf-8')
         else:
+            # 如果 buffer 還有值，就從裡面取出一個字元回傳
+            if self.buffer:
+                char, self.buffer = self.buffer[0], self.buffer[1:]
+                return char
+
+            # 使用 select 來實現 0.01 秒超時
+            ready, _, _ = select.select([sys.stdin], [], [], 0.01)
+            if not ready:
+                return None
+
             try:
-                return sys.stdin.read(1) or None
+                # 把 stdin 所有的值都讀進來先放到 buffer
+                self.buffer = sys.stdin.read()
+                if not self.buffer:
+                    return None
+
+                # 取出 buffer 的第一個字元回傳，剩下的繼續放在 buffer 裡面
+                char, self.buffer = self.buffer[0], self.buffer[1:]
+                return char
             except BlockingIOError:
                 return None
             except Exception:
                 return None
 
     def detect_special_key(self):
-        if self._last_ch_ord == 0x03:
+        if self._last_char_ord == 0x03:
             return self.Key.CTRL_C
-        if self._last_ch_ord == 0x7F:
+        if self._last_char_ord == 0x7F:
             return self.Key.BACKSPACE
-        if self._last_ch_ord in {0x0A, 0x0D}:
+        if self._last_char_ord in {0x0A, 0x0D}:
             return self.Key.ENTER
-        if self._last_ch_ord == 0x08:
+        if self._last_char_ord == 0x08:
             return self.Key.CTRL_H
-        if self._last_ch_ord == 0x17:
+        if self._last_char_ord == 0x17:
             return self.Key.CTRL_W
-        if self._last_ch_ord == 0x1B:
+        if self._last_char_ord == 0x1B:
             return self._process_0x1B()
 
         return None
@@ -154,7 +174,7 @@ class KBHit:
 
 
 # Test
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import time
 

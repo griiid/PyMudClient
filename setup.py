@@ -1,6 +1,9 @@
 import pathlib
 
-from setuptools import find_packages, setup
+from setuptools import (
+    find_packages,
+    setup,
+)
 
 HERE = pathlib.Path(__file__).parent.resolve()
 
@@ -11,9 +14,9 @@ URL = 'https://github.com/griiid/PyMudClient'
 DOWNLOAD_URL = 'https://pypi.org/project/pymudclient/'
 
 LICENSE = 'MIT'
-VERSION = '0.5.0'
+VERSION = '1.0.0'
 DESCRIPTION = 'A MUD client core written in Python'
-LONG_DESCRIPTION = (HERE  / 'README.md').read_text(encoding='utf8')
+LONG_DESCRIPTION = (HERE / 'README.md').read_text(encoding='utf8')
 LONG_DESC_TYPE = 'text/markdown'
 
 requirements = (HERE / 'requirements.txt').read_text(encoding='utf8')
