@@ -14,7 +14,7 @@ URL = 'https://github.com/griiid/PyMudClient'
 DOWNLOAD_URL = 'https://pypi.org/project/pymudclient/'
 
 LICENSE = 'MIT'
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 DESCRIPTION = 'A MUD client core written in Python'
 LONG_DESCRIPTION = (HERE / 'README.md').read_text(encoding='utf8')
 LONG_DESC_TYPE = 'text/markdown'
