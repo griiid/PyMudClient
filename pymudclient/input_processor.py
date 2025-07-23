@@ -150,9 +150,11 @@ class InputProcessor:
 
             text = shared_data.CURRENT_INPUT['input']
 
-            text = cls._alias_function(text)
+            text, has_alias = cls._alias_function(text)
             if text:
                 send_to_host(text)
+            elif not has_alias:
+                send_to_host('')
 
             shared_data.CURRENT_INPUT['input'] = ''
             shared_data.CURRENT_INPUT['input_index'] = 0
@@ -221,11 +223,11 @@ class InputProcessor:
                 continue
 
             if alias.pattern:
-                return cls._alias_pattern_process(alias.pattern, text)
+                return cls._alias_pattern_process(alias.pattern, text), True
             if alias.func:
-                return alias.func(text)
+                return alias.func(text), True
 
-        return text
+        return text, False
 
     @classmethod
     def _alias_pattern_process(cls, pattern, text):
