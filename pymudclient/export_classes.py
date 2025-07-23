@@ -6,21 +6,21 @@ from typing import Callable
 class Alias:
 
     start_text: str
-    pattern: str = None
-    func: Callable = None
+    pattern: str | None = None
+    func: Callable | None = None
 
 
 @dataclass
 class Trigger:
 
     pattern: str
-    data: str = None
-    func: Callable = None
+    data: str | None = None
+    func: Callable | None = None
 
 
 @dataclass
 class Timer:
 
     seconds: int
-    data: str = None
-    func: Callable = None
+    data: str | None = None
+    func: Callable | None = None

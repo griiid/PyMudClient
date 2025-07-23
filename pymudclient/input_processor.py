@@ -22,28 +22,32 @@ class InputProcessor:
         kb = KBHit()
 
         while shared_data.CONNECT_STATUS.get() == Status.RUNNING:
-            key = kb.getch()
-            if key is None:
-                time.sleep(configs.THREAD_SLEEP_TIME)
-                continue
+            try:
+                key = kb.getch()
+                if key is None:
+                    time.sleep(configs.THREAD_SLEEP_TIME)
+                    continue
 
-            special_key = kb.detect_special_key()
-            if special_key:
-                is_special_key = True
-                key = special_key
-                key_ord = None
-            else:
-                is_special_key = False
-                key_ord = ord(key)
+                special_key = kb.detect_special_key()
+                if special_key:
+                    is_special_key = True
+                    key = special_key
+                    key_ord = None
+                else:
+                    is_special_key = False
+                    key_ord = ord(key)
 
-            for func in [
-                    cls._input_visible,
-                    cls._input_special_keys,
-            ]:
-                if func(key, key_ord, is_special_key):
-                    break
+                for func in [
+                        cls._input_visible,
+                        cls._input_special_keys,
+                ]:
+                    if func(key, key_ord, is_special_key):
+                        break
 
-            show_input()
+                show_input()
+            except Exception as e:
+                import traceback
+                print(traceback.format_exc())
 
         kb.set_normal_term()
 
@@ -149,8 +153,6 @@ class InputProcessor:
             text = cls._alias_function(text)
             if text:
                 send_to_host(text)
-            else:
-                send_to_host('')
 
             shared_data.CURRENT_INPUT['input'] = ''
             shared_data.CURRENT_INPUT['input_index'] = 0
@@ -229,6 +231,10 @@ class InputProcessor:
     def _alias_pattern_process(cls, pattern, text):
         split_text = text.split()
         params = {}
+
+        # variable map
+        for key, value in configs.VARIABLE_MAP.items():
+            pattern = pattern.replace(f'${{{key}}}', value)
 
         # %0
         if '%0' in pattern:

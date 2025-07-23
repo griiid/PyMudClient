@@ -1,9 +1,15 @@
 import threading
 import time
+from typing import Callable
 
 from pymudclient import (
     configs,
     shared_data,
+)
+from pymudclient.export_classes import (
+    Alias,
+    Timer,
+    Trigger,
 )
 from pymudclient.input_processor import InputProcessor
 from pymudclient.recv_processor import RecvProcessor
@@ -17,16 +23,16 @@ class PyMudClient:
 
     def __init__(
         self,
-        host,
-        port,
-        account=None,
-        password=None,
-        alias_list=None,
-        trigger_list=None,
-        timer_list=None,
-        variable_map=None,
-        pre_process_recv_content_func=None,
-        encoding='latin1',
+        host: str,
+        port: int,
+        account: str | None = None,
+        password: str | None = None,
+        alias_list: list[Alias] | None = None,
+        trigger_list: list[Trigger] | None = None,
+        timer_list: list[Timer] | None = None,
+        variable_map: dict[str, str] | None = None,
+        pre_process_recv_content_func: Callable[[str], str] | None = None,
+        encoding: str = 'latin1',
     ):
         self.host = host
         self.port = port

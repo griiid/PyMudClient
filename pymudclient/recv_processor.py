@@ -32,7 +32,10 @@ class RecvProcessor:
                         time.sleep(configs.THREAD_SLEEP_TIME)
 
                 if pre_process_recv_content_func is not None:
-                    data = pre_process_recv_content_func(data)
+                    new_data = pre_process_recv_content_func(data)
+                    if new_data is not None:
+                        data = new_data
+
                 data = shared_data.TN.get().re_decode(data)
                 content_list = data.split('\r\n')
 
