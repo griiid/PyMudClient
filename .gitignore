@@ -222,3 +222,4 @@ aliases.py
 settings.py
 timers.py
 triggers.py
+variable_map.py
