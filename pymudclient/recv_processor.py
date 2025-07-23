@@ -24,12 +24,13 @@ class RecvProcessor:
                     # 如果有資料，就在 0.1 秒內一直讀取，把這次 server 傳來的資料收完
                     data = shared_data.TN.get().read_very_eager()
                     if not data:
+                        time.sleep(configs.THREAD_SLEEP_TIME)
                         continue
 
                     start_time = time.time()
                     while time.time() - start_time < 0.1:
                         data += shared_data.TN.get().read_very_eager()
-                        time.sleep(configs.THREAD_SLEEP_TIME)
+                        time.sleep(0.001)
 
                 if pre_process_recv_content_func is not None:
                     new_data = pre_process_recv_content_func(data)
