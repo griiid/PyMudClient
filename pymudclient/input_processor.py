@@ -11,48 +11,18 @@ from pymudclient.utils.print import color_print
 from pymudclient.utils.telnet import send_to_host
 
 
-class TimerProcessor:
-
-    @dataclass
-    class _Timer:
-
-        seconds: int
-        last_time: int
-        data: str = None
-        func: Callable = None
-
-    def __init__(self, timer_list):
-        last_time = time.time()
-        self.timer_list = [self._Timer(timer.seconds, last_time, timer.data, timer.func) for timer in timer_list]
-
-    def process(self):
-        for timer in self.timer_list:
-            if time.time() - timer.last_time >= timer.seconds:
-                timer.last_time = time.time()
-
-                if timer.data:
-                    send_to_host(timer.data)
-                elif timer.func:
-                    text = timer.func()
-                    if text:
-                        send_to_host(text)
-
-
 class InputProcessor:
 
     ALIAS_LIST = []
 
     @classmethod
-    def process(cls, alias_list, timer_list):
+    def process(cls, alias_list):
         cls.ALIAS_LIST = alias_list
         kb = KBHit()
-        timer_processor = TimerProcessor(timer_list)
 
         while shared_data.CONNECT_STATUS.get() == Status.RUNNING:
-            # TODO: 這邊要避免 lock
             key = kb.getch()
             if key is None:
-                timer_processor.process()
                 time.sleep(0.01)
                 continue
 

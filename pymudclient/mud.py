@@ -8,6 +8,7 @@ from pymudclient import (
 from pymudclient.input_processor import InputProcessor
 from pymudclient.recv_processor import RecvProcessor
 from pymudclient.shared_data import Status
+from pymudclient.timer_processor import TimerProcessor
 from pymudclient.utils.print import color_print
 from pymudclient.utils.telnet import TelnetClient
 
@@ -136,7 +137,8 @@ class PyMudClient:
 
     def _thread_start(self):
         thread_func_list = [
-            (InputProcessor.process, [self.alias_list, self.timer_list]),
+            (InputProcessor.process, [self.alias_list]),
+            (TimerProcessor.process, [self.timer_list]),
             (RecvProcessor.process, [self.trigger_list, self.pre_process_recv_content_func]),
         ]
         self._thread_list = []
