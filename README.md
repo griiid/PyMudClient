@@ -360,6 +360,7 @@ color_print(f'$HIY${datetime.now()}$NOR$')
 ## MudColorAlias
 
 - 提供在 MUD 內常用來定義顏色的字串。
+- 注意：實際上在 terminal 顯示的顏色會根據 terminal 設定而改變。
 
 ### 常數
 
@@ -380,7 +381,7 @@ color_print(f'$HIY${datetime.now()}$NOR$')
 - HIGH_CYAN: 高亮青色
 - HIGH_WHITE: 高亮白色
 
-![alt text](docs/images/mud_color_demo.png)
+<img src="docs/images/mud_color_demo.png" alt="mud color demo" width="150">
 
 ### 使用範例
 
