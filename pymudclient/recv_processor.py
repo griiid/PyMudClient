@@ -1,7 +1,10 @@
 import re
 import time
 
-from pymudclient import shared_data
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.display import show_input
 from pymudclient.shared_data import Status
 from pymudclient.utils.print import (
@@ -26,7 +29,7 @@ class RecvProcessor:
                     start_time = time.time()
                     while time.time() - start_time < 0.1:
                         data += shared_data.TN.get().read_very_eager()
-                        time.sleep(0.001)
+                        time.sleep(configs.THREAD_SLEEP_TIME)
 
                 if pre_process_recv_content_func is not None:
                     data = pre_process_recv_content_func(data)

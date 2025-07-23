@@ -2,7 +2,10 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-from pymudclient import shared_data
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.shared_data import Status
 from pymudclient.utils.telnet import send_to_host
 
@@ -36,4 +39,4 @@ class TimerProcessor:
                         if text:
                             send_to_host(text)
 
-            time.sleep(0.001)
+            time.sleep(configs.THREAD_SLEEP_TIME)

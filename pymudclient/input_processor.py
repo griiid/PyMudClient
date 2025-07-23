@@ -1,9 +1,10 @@
 import re
 import time
-from dataclasses import dataclass
-from typing import Callable
 
-from pymudclient import shared_data
+from pymudclient import (
+    configs,
+    shared_data,
+)
 from pymudclient.display import show_input
 from pymudclient.shared_data import Status
 from pymudclient.utils.kbhit import KBHit
@@ -23,7 +24,7 @@ class InputProcessor:
         while shared_data.CONNECT_STATUS.get() == Status.RUNNING:
             key = kb.getch()
             if key is None:
-                time.sleep(0.01)
+                time.sleep(configs.THREAD_SLEEP_TIME)
                 continue
 
             special_key = kb.detect_special_key()
