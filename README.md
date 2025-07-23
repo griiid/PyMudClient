@@ -15,25 +15,25 @@
   - [輸入介面](#輸入介面)
   - [API Reference](#api-reference)
     - [PyMudClient](#pymudclient)
-  - [pre\_process\_recv\_content\_func](#pre_process_recv_content_func)
-    - [function prototype](#function-prototype)
-    - [使用範例](#使用範例-1)
+    - [pre\_process\_recv\_content\_func](#pre_process_recv_content_func)
+      - [function prototype](#function-prototype)
+      - [使用範例](#使用範例-1)
+    - [color\_print](#color_print)
+      - [使用範例](#使用範例-2)
+    - [MudColorAlias](#mudcoloralias)
+      - [常數](#常數)
+      - [使用範例](#使用範例-3)
     - [Alias](#alias)
       - [Alias class 說明](#alias-class-說明)
-      - [使用範例](#使用範例-2)
+      - [使用範例](#使用範例-4)
     - [Trigger](#trigger)
       - [Trigger class 說明](#trigger-class-說明)
-      - [使用範例](#使用範例-3)
+      - [使用範例](#使用範例-5)
     - [Timer](#timer)
       - [Timer class 說明](#timer-class-說明)
-      - [使用範例](#使用範例-4)
-  - [Variable Map](#variable-map)
-    - [使用範例](#使用範例-5)
-  - [color\_print](#color_print)
-    - [使用範例](#使用範例-6)
-  - [MudColorAlias](#mudcoloralias)
-    - [常數](#常數)
-    - [使用範例](#使用範例-7)
+      - [使用範例](#使用範例-6)
+    - [Variable Map](#variable-map)
+      - [使用範例](#使用範例-7)
   - [License](#license)
 
 ## 支援功能
@@ -130,9 +130,9 @@ PyMudClient.__init__(
 - pre_process_recv_content_func: (optional) 從 server 接收到內容後會先呼叫這個 function 再根據回傳的結果顯示到畫面上，參考 [pre_process_recv_content_func](#pre_process_recv_content_func)。
 - encoding: (optional) server 內容的編碼，例如 `big5hkscs`。
 
-## pre_process_recv_content_func
+### pre_process_recv_content_func
 
-### function prototype
+#### function prototype
 
 ```py
 def pre_process_recv_content_func(content: str) -> str:
@@ -143,7 +143,7 @@ def pre_process_recv_content_func(content: str) -> str:
 - 傳入 content，回傳修改後的 content。
 - 舉例來說，KK 的 server 有時會有 `\x1B[1m` 的文字插在 `big5hkscs` 中文字的 2 個 bytes 之間，導致中文字沒辦法被正確的處理，可以利用這個 function 移除。
 
-### 使用範例
+#### 使用範例
 
 ```py
 def remove_strange_color_code(content: str) -> str:
@@ -179,6 +179,67 @@ def remove_strange_color_code(content: str) -> str:
                 status = 0
 
     return new_content
+```
+
+### color_print
+
+- 可以印出帶有顏色的文字，可搭配 MudColorAlias 使用。
+
+#### 使用範例
+
+```py
+from datetime import datetime
+
+from pymudclient import (
+    MudColorAlias,
+    color_print,
+)
+
+
+color_print(f'$HIY${datetime.now()}$NOR$')
+```
+
+- 這邊的 `$HIY$` 跟 `$NOR$` 是 MUD 內常用來定義顏色的字串，雖然不難記，但也可以直接使用 [MudColorAlias](#mudcoloralias)。
+- 開頭使用 `$HIY$` 讓顏色切換成高亮黃色，所以接下來的文字都會變成高亮黃色顯示，結尾的 `$NOR$` 是讓顏色變回預設顏色。
+
+### MudColorAlias
+
+- 提供在 MUD 內常用來定義顏色的字串。
+- 注意：實際上在 terminal 顯示的顏色會根據 terminal 設定而改變。
+
+#### 常數
+
+- NORMAL: 重置為正常顏色
+- BLACK: 黑色
+- RED: 紅色
+- GREEN: 綠色
+- YELLOW: 黃色
+- BLUE: 藍色
+- MAGENTA: 洋紅色
+- CYAN: 青色
+- WHITE: 白色
+- HIGH_RED: 高亮紅色
+- HIGH_GREEN: 高亮綠色
+- HIGH_YELLOW: 高亮黃色
+- HIGH_BLUE: 高亮藍色
+- HIGH_MAGENTA: 高亮洋紅色
+- HIGH_CYAN: 高亮青色
+- HIGH_WHITE: 高亮白色
+
+<img src="docs/images/mud_color_demo.png" alt="mud color demo" width="150">
+
+#### 使用範例
+
+```py
+from datetime import datetime
+
+from pymudclient import (
+    MudColorAlias,
+    color_print,
+)
+
+
+color_print(f'{MudColorAlias.HIGH_CYAN}{datetime.now()}{MudColorAlias.NORMAL}')
 ```
 
 ### Alias
@@ -316,13 +377,13 @@ TIMER_LIST = [
 - 第二個 Timer 是每 60 秒呼叫一次 print_time 這個 function。
   - print_time 內使用到的 color_print 以及 MudColorAlias 的目的是印出帶有顏色的文字，參考下面的 [color_print](#color_print) 跟 [MudColorAlias](#mudcoloralias) 說明。
 
-## Variable Map
+### Variable Map
 
 - 型別：`dict[str, str]`
 - 可以建立常用變數，在 Trigger, Alias, Timer 內要送指令到 server 時使用。
 - 變數使用格式：`${變數名}`，例如 `${ACCOUNT}` 會被替換為對應的值。
 
-### 使用範例
+#### 使用範例
 
 ```py
 VARIABLE_MAP = {
@@ -335,67 +396,6 @@ ALIAS_LIST = [
 ```
 
 - 當輸入 `doremi` 時，就會傳送 `sing 霹靂卡霹靂拉拉波波力那貝貝魯多` 到 server
-
-## color_print
-
-- 可以印出帶有顏色的文字，可搭配 MudColorAlias 使用。
-
-### 使用範例
-
-```py
-from datetime import datetime
-
-from pymudclient import (
-    MudColorAlias,
-    color_print,
-)
-
-
-color_print(f'$HIY${datetime.now()}$NOR$')
-```
-
-- 這邊的 `$HIY$` 跟 `$NOR$` 是 MUD 內常用來定義顏色的字串，雖然不難記，但也可以直接使用 [MudColorAlias](#mudcoloralias)。
-- 開頭使用 `$HIY$` 讓顏色切換成高亮黃色，所以接下來的文字都會變成高亮黃色顯示，結尾的 `$NOR$` 是讓顏色變回預設顏色。
-
-## MudColorAlias
-
-- 提供在 MUD 內常用來定義顏色的字串。
-- 注意：實際上在 terminal 顯示的顏色會根據 terminal 設定而改變。
-
-### 常數
-
-- NORMAL: 重置為正常顏色
-- BLACK: 黑色
-- RED: 紅色
-- GREEN: 綠色
-- YELLOW: 黃色
-- BLUE: 藍色
-- MAGENTA: 洋紅色
-- CYAN: 青色
-- WHITE: 白色
-- HIGH_RED: 高亮紅色
-- HIGH_GREEN: 高亮綠色
-- HIGH_YELLOW: 高亮黃色
-- HIGH_BLUE: 高亮藍色
-- HIGH_MAGENTA: 高亮洋紅色
-- HIGH_CYAN: 高亮青色
-- HIGH_WHITE: 高亮白色
-
-<img src="docs/images/mud_color_demo.png" alt="mud color demo" width="150">
-
-### 使用範例
-
-```py
-from datetime import datetime
-
-from pymudclient import (
-    MudColorAlias,
-    color_print,
-)
-
-
-color_print(f'{MudColorAlias.HIGH_CYAN}{datetime.now()}{MudColorAlias.NORMAL}')
-```
 
 ## License
 
